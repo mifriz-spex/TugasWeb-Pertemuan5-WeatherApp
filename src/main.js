@@ -36,23 +36,23 @@ const updateBackground = (weatherCondition) => {
 
     switch (weatherCondition) {
         case 'Clear':
-            bgUrl = '/cerah.jpg';
+            bgUrl = 'cerah.jpg';
             break;
         case 'Clouds':
-            bgUrl = '/mendung.jpg';
+            bgUrl = 'mendung.jpg';
             break;
         case 'Rain':
         case 'Drizzle':
-            bgUrl = '/hujan.jpg';
+            bgUrl = 'hujan.jpg';
             break;
         case 'Thunderstorm':
-            bgUrl = '/badai.jpg';
+            bgUrl = 'badai.jpg';
             break;
         case 'Snow':
-            bgUrl = '/salju.jpg'; // Opsional kalau mau nambah salju
+            bgUrl = 'salju.jpg'; // Opsional kalau mau nambah salju
             break;
         default:
-            bgUrl = '/normal.jpg'; // Background default kalau cuaca tidak terdefinisi
+            bgUrl = 'normal.jpg'; // Background default kalau cuaca tidak terdefinisi
     }
 
     // Mengganti background body CSS secara dinamis
