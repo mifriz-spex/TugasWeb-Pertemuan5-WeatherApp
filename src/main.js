@@ -63,6 +63,8 @@ const updateBackground = (weatherCondition) => {
 const updateUI = (data) => {
     cityName.textContent = data.name;
     currentDate.textContent = formatDate();
+
+    updateBackground(data.weather[0].main);
     
     // Set icon dari OpenWeatherMap
     const iconCode = data.weather[0].icon;
