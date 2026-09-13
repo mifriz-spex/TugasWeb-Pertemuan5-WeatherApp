@@ -30,6 +30,35 @@ const formatDate = () => {
     return new Date().toLocaleDateString('en-GB', options);
 };
 
+// Fungsi untuk mengganti background berdasarkan cuaca
+const updateBackground = (weatherCondition) => {
+    let bgUrl = '';
+
+    switch (weatherCondition) {
+        case 'Clear':
+            bgUrl = '/cerah.jpg';
+            break;
+        case 'Clouds':
+            bgUrl = '/mendung.jpg';
+            break;
+        case 'Rain':
+        case 'Drizzle':
+            bgUrl = '/hujan.jpg';
+            break;
+        case 'Thunderstorm':
+            bgUrl = '/badai.jpg';
+            break;
+        case 'Snow':
+            bgUrl = '/salju.jpg'; // Opsional kalau mau nambah salju
+            break;
+        default:
+            bgUrl = '/normal.jpg'; // Background default kalau cuaca tidak terdefinisi
+    }
+
+    // Mengganti background body CSS secara dinamis
+    document.body.style.backgroundImage = `url('${bgUrl}')`;
+};
+
 // Arrow Function: Update UI setelah data berhasil diambil
 const updateUI = (data) => {
     cityName.textContent = data.name;
