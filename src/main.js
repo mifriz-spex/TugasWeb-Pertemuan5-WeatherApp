@@ -1,14 +1,16 @@
 import './style.css';
-import { getWeatherByCity } from './api.js';
+import { getWeatherByCity, getForecastByCity } from './api.js';
 import { addHistory } from './storage.js';
 
 // DOM Elements
 const cityInput = document.getElementById('city-input');
 const searchBtn = document.getElementById('search-btn');
+const initialState = document.getElementById('initial-state');
 const loadingState = document.getElementById('loading-state');
 const errorState = document.getElementById('error-state');
 const errorMsg = document.getElementById('error-msg');
 const weatherInfo = document.getElementById('weather-info');
+const forecastContainer = document.getElementById('forecast-container');
 
 // DOM Elements Info Cuaca
 const cityName = document.getElementById('city-name');
@@ -78,17 +80,54 @@ const updateUI = (data) => {
     // Tampilkan data, sembunyikan loading & error
     loadingState.classList.add('hidden');
     errorState.classList.add('hidden');
+    
+    // PERBAIKAN: Menambahkan flex dan flex-col secara bersamaan
     weatherInfo.classList.remove('hidden');
-    weatherInfo.classList.add('flex');
+    weatherInfo.classList.add('flex', 'flex-col');
+};
+
+const updateForecastUI = (forecastData) => {
+    forecastContainer.innerHTML = ''; // Bersihkan isi kontainer lama
+
+    // API mengembalikan 40 data (per 3 jam). 
+    // Kita filter HANYA mengambil data pada jam 12:00:00 untuk mewakili cuaca hari itu.
+    const dailyData = forecastData.list.filter(item => item.dt_txt.includes('12:00:00'));
+
+    dailyData.forEach(day => {
+        // Mengambil nama hari (misal: Mon, Tue)
+        const date = new Date(day.dt * 1000);
+        const dayName = date.toLocaleDateString('en-GB', { weekday: 'short' });
+        
+        const iconCode = day.weather[0].icon;
+        const temp = Math.round(day.main.temp);
+
+        // Buat elemen kartu kecil
+        const forecastCard = `
+            <div class="flex flex-col items-center justify-center p-2 bg-black/20 rounded-[10px] w-full max-w-[70px]">
+                <h5 class="text-xs font-[500] text-white/80">${dayName}</h5>
+                <img src="https://openweathermap.org/img/wn/${iconCode}@2x.png" alt="icon" class="w-10 h-10 object-contain drop-shadow-md my-1">
+                <h4 class="text-sm font-bold">${temp}°</h4>
+            </div>
+        `;
+        
+        // Suntikkan ke dalam container
+        forecastContainer.insertAdjacentHTML('beforeend', forecastCard);
+    });
 };
 
 // Arrow Function: Mengambil data dan mengatur transisi loading
 const fetchWeather = async (city) => {
     if (!city) return;
 
+    // Initial Set
+    initialState.classList.remove('flex', 'flex-col');
+    initialState.classList.add('hidden');
+
     // Tampilkan state Loading
-    weatherInfo.classList.remove('flex');
+    // PERBAIKAN: Menghapus flex dan flex-col sekaligus
+    weatherInfo.classList.remove('flex', 'flex-col');
     weatherInfo.classList.add('hidden');
+    
     errorState.classList.add('hidden');
     
     loadingState.classList.remove('hidden');
@@ -96,10 +135,14 @@ const fetchWeather = async (city) => {
 
     try {
         const weatherData = await getWeatherByCity(city, currentUnit);
+        const forecastData = await getForecastByCity(city, currentUnit);
         
         currentCity = city; 
         addHistory(city); // Simpan ke history menggunakan storage.js
         updateUI(weatherData);
+        if (forecastData) {
+            updateForecastUI(forecastData);
+        }
 
     } catch (error) {
         // Tampilkan state Error
@@ -107,7 +150,7 @@ const fetchWeather = async (city) => {
         loadingState.classList.add('hidden');
         
         errorState.classList.remove('hidden');
-        errorState.classList.add('flex');
+        errorState.classList.add('flex', 'flex-col');
         
         errorMsg.textContent = error.message;
     }
@@ -143,5 +186,6 @@ unitToggle.addEventListener('click', () => {
     fetchWeather(currentCity);
 });
 
-// (Opsional) Sembunyikan info cuaca saat aplikasi baru pertama kali dimuat
+//Sembunyikan info cuaca saat aplikasi baru pertama kali dimuat
 weatherInfo.classList.add('hidden');
+weatherInfo.classList.remove('flex', 'flex-col');

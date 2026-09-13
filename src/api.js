@@ -27,3 +27,19 @@ export const getWeatherByCity = async (city, unit = 'metric') => {
         throw error;
     }
 };
+
+//forecast 5 hari
+export const getForecastByCity = async (city, unit = 'metric') => {
+    try {
+        const response = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${API_KEY}&units=${unit}`);
+        
+        if (!response.ok) {
+            throw new Error('Gagal mengambil data prakiraan cuaca');
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error("Error fetching forecast:", error);
+        return null; // Kembalikan null jika gagal agar tidak merusak tampilan utama
+    }
+};
